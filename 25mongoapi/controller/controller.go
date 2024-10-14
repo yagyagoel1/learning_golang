@@ -5,11 +5,12 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/yagyagoel1/learning_golang/model"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-const connectionString = ""
+const connectionString = "mongodb://localhost:27017/"
 const dbName = "netflix"
 
 const colName = "watchlist"
@@ -34,3 +35,13 @@ func init() {
 
 	fmt.Println("collection instance is ready")
 }
+
+func insertOneMovie(movie model.Netflix) {
+	inserted, err := collection.InsertOne(context.Background(), movie)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println("inserted 1 moive in db with id:", inserted.InsertedID)
+}
+
+//update one record
