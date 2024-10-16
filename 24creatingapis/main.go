@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"math/rand"
 	"net/http"
 	"time"
@@ -31,7 +32,22 @@ func (c *Course) IsEmpty() bool {
 	return c.CourseName == ""
 }
 func main() {
+	fmt.Println("apis")
+	r := mux.NewRouter()
 
+	courses = append(courses, Course{CourseId: "2", CourseName: "ReactJs", CoursePrice: 299, Author: &Author{Fullname: "yagya goel", Website: "yagyagoel1"}})
+	courses = append(courses, Course{CourseId: "4", CourseName: "mernstack", CoursePrice: 299, Author: &Author{Fullname: "yagya goel", Website: "go.dev"}})
+
+	//routing
+	r.HandleFunc("/", serveHome).Methods("GET")
+	r.HandleFunc("/courses", getAllCourses).Methods("GET")
+	r.HandleFunc("/course/{id}", getOneCourse).Methods("GET")
+	r.HandleFunc("/", createOneCourse).Methods("POST")
+	r.HandleFunc("/course/{id}", updateOneCourse).Methods("PUT")
+	r.HandleFunc("/course/{id}", deleteOneCourse).Methods("DELETE")
+
+	//listen to port
+	log.Fatal(http.ListenAndServe(":4000", r))
 }
 
 //controller
@@ -65,7 +81,6 @@ func getOneCourse(w http.ResponseWriter, r *http.Request) {
 
 	}
 	json.NewEncoder(w).Encode("no course found with given id ")
-	return
 }
 
 func createOneCourse(w http.ResponseWriter, r *http.Request) {
@@ -121,7 +136,7 @@ func deleteOneCourse(w http.ResponseWriter, r *http.Request) {
 		if course.CourseId == params["id"] {
 			courses = append(courses[:index], courses[index+1:]...)
 			json.NewEncoder(w).Encode(`this id ` + params["id"] + "is deleted")
-			break
+			return
 		}
 	}
 	json.NewEncoder(w).Encode("this id does not exist")
